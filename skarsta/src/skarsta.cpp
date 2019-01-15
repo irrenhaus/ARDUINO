@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Display.h>
 #include <Keypad.h>
+#include <Watchdog.h>
 
 #ifdef __H_BRIDGE_MOTOR__
 #include <MotorBridge.h>
@@ -22,7 +23,7 @@
 #define L_PWM 10
 
 static Service **services;
-static const uint8_t services_count = 3;
+static const uint8_t services_count = 4;
 
 #ifdef __EEPROM__
 
@@ -66,9 +67,10 @@ void setup()
     auto motor = new MotorRelay(ENCODER_PIN_CLK, ENCODER_PIN_DIO, POWER_RELAY, DIRECTION_RELAY);
 #endif
     auto display = new Display(DISPLAY_PIN_CLK, DISPLAY_PIN_DIO);
-    services = new Service *[services_count] { (Service *)new Keypad(motor, display),
-                                                   (Service *)motor,
-                                                   (Service *)display };
+    services = new Service *[services_count]{(Service *) new Watchdog(motor, display),
+                                             (Service *) new Keypad(motor, display),
+                                             (Service *) motor,
+                                             (Service *) display};
 
 #ifdef __DEBUG__
     Serial.println("starting");
